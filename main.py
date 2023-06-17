@@ -17,6 +17,7 @@ def mediapipe_detection(image, model):
     image_copy = cv2.cvtColor(image_copy, cv2.COLOR_RGB2BGR)  # convert RGB -> BGR
     return image_copy, results
 
+#original, no format
 def draw_landmarks(image, results):
     mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION) # Draw face connections
     mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS) # Draw pose connections
@@ -24,7 +25,22 @@ def draw_landmarks(image, results):
     mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS) # Draw right hand connections
 mp_holistic.POSE_CONNECTIONS
 
-cap = cv2.VideoCapture(1)
+def draw_styled_landmarks(image, results):
+    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION, # Draw face connections
+                              mp_drawing.DrawingSpec(color=(80,110, 10), thickness=1, circle_radius=1), # Color land mark, dot 
+                              mp_drawing.DrawingSpec(color=(80,256, 110), thickness=1, circle_radius=1)) # Color connections, line
+    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS, # Draw pose connections
+                              mp_drawing.DrawingSpec(color=(0,256,256), thickness=2, circle_radius=4), # Color land mark, dot 
+                              mp_drawing.DrawingSpec(color=(0,0,256), thickness=2, circle_radius=2)) # Color connections, line)
+    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, # Draw left hand connections
+                              mp_drawing.DrawingSpec(color=(256,0, 0), thickness=2, circle_radius=4), # Color land mark, dot 
+                              mp_drawing.DrawingSpec(color=(0,0, 256), thickness=2, circle_radius=2)) # Color connections, line)
+    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, # Draw right hand connections
+                              mp_drawing.DrawingSpec(color=(0,256, 0), thickness=2, circle_radius=4), # Color land mark, dot 
+                              mp_drawing.DrawingSpec(color=(0,0, 256), thickness=2, circle_radius=2)) # Color connections, line)
+
+
+cap = cv2.VideoCapture(0)
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
 
@@ -35,8 +51,8 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         image, results = mediapipe_detection(frame, holistic)
         print(results)
 
-        # draw landmarkss
-        draw_landmarks(image,results)
+        # draw landmarks
+        draw_styled_landmarks(image,results)
 
         # Output on screen
         cv2.imshow('OpenCV Feed', image)
