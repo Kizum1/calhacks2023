@@ -2,11 +2,11 @@ const dynamicTextElement = document.getElementById('dynamicText');
 const changeButton = document.getElementById('changeButton');
 
 const texts = [
-    'A',
-    'B',
-    'C',
-    'D',
-    'E'
+    '1',
+    '2',
+    '3',
+    '4',
+    '5'
 ];
 
 let currentIndex = 0;

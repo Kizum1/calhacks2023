@@ -4,7 +4,7 @@
     display: flex;
     position: relative;
     text-align: center;
-    bottom: 100px;
+   
     user-select: none;
   
     .wrapper {
