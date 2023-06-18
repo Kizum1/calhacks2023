@@ -1,19 +1,15 @@
-const dynamicTextElement = document.getElementById('dynamicText');
-const changeButton = document.getElementById('changeButton');
+// JavaScript code for level.js
 
-const texts = [
-    'A',
-    'B',
-    'C',
-    'D',
-    'E'
-];
+const words = ['Hello', 'World', 'OpenAI', 'GPT', 'Code'];
+let currentWordIndex = 0;
 
-let currentIndex = 0;
+function displayText() {
+  const textContainer = document.getElementById('dynamicText');
+  textContainer.textContent = words[currentWordIndex];
 
-function changeText() {
-  dynamicTextElement.textContent = texts[currentIndex];
-  currentIndex = (currentIndex + 1) % texts.length;
+  if (currentWordIndex === words.length - 1) {
+    document.getElementById('changeButton').disabled = true;
+  }
+
+  currentWordIndex++;
 }
-
-changeButton.addEventListener('click', changeText);

@@ -8,6 +8,7 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="css\level1title.css">
     <link rel="stylesheet" href="css\level1bg.css">
+    <link rel="stylesheet" href="css\level1button.css">
 </head>
 
 <body>
@@ -15,11 +16,13 @@
     <h1 data-heading="title">Level 1: The Alphabet Area</h1>
     Sign this:
     <div class="dropping-texts" id="dynamicText"></div>
+    <img src="{{ url_for('video_feed') }}" width="600" height="480">
     <div class="centerButton">
-    <button id="changeButton" class="button-75"><span class="text">Change Text</span></button>
+        <button id="changeButton" class="button-75" onclick="displayText()"><span class="text">Change Text</span></button>
     </div>
-    <button class="btn-hover color-1" onclick="location.href='level2.html';" value="Contact">NEXT LEVEL
+    <button id="nextButton" class="next-lvl" onclick="location.href='level2.html';">NEXT LEVEL</button>
+    
+    <script src="js\level.js"></script>
 </body>
-<script src="js\level.js">
-</script>
+
 </html>
