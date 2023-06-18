@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
 import os
+import time
 from sklearn.model_selection import train_test_split
-from mediapipe_utils import mediapipe_detection, draw_styled_landmarks
-from data_utils import extract_keypoints, create_data_directories, collect_frames_and_export_keypoints, load_data
-from model_utils import train_model, save_model, load_model, evaluate_model, calculate_accuracy, calculate_confusion_matrix
-from camera import createModel
+from functions.mediapipe_utils import mediapipe_detection, draw_styled_landmarks
+from functions.data_utils import extract_keypoints, create_data_directories, collect_frames_and_export_keypoints, load_data
+from functions.model_utils import train_model, save_model, load_model, evaluate_model, calculate_accuracy, calculate_confusion_matrix
+from functions.camera import createModel
 
 # Set up paths and parameters
 DATA_PATH = os.path.join('MP_Data')
@@ -16,12 +17,21 @@ actions = np.array(['hello'])
 num_sequences = 50
 sequence_length = 30
 
+
+
 # Step 1: Create data directories
 # create_data_directories(DATA_PATH, actions, num_sequences)
 
 # Step 2: Collect frames and export keypoints
-cap = cv2.VideoCapture(0)
+
+#NOTE ERRORS MAY OCCUR IF WRONG CV2 CAM ENTRY, differs for each laptop
+cap = cv2.VideoCapture(1)
 createModel(cap)
+# frame = cap.read()
+# with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+#     image, results = mediapipe_detection(frame, holistic)
+
+
 
 
 #collect_frames_and_export_keypoints(cap, DATA_PATH, actions, num_sequences, sequence_length)

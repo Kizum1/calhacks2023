@@ -6,7 +6,7 @@ from keras.models import Sequential
 from keras.layers import LSTM, Dense
 from keras.callbacks import TensorBoard
 from sklearn.metrics import multilabel_confusion_matrix, accuracy_score
-from data_utils import actions
+from functions.data_utils import actions
 
 def train_model(X_train, y_train, log_dir):
     model = Sequential()

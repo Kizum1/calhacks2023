@@ -1,5 +1,5 @@
 import cv2
-from mediapipe_utils import mp_holistic, mp_drawing, mediapipe_detection, draw_styled_landmarks
+from functions.mediapipe_utils import mp_holistic, mp_drawing, mediapipe_detection, draw_styled_landmarks
 import mediapipe as mp
 
 def createModel (cap):

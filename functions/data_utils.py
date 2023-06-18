@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
-from mediapipe_utils import mediapipe_detection, draw_styled_landmarks
+from functions.mediapipe_utils import mediapipe_detection, draw_styled_landmarks
 import mediapipe as mp
 
 data_path = os.path.join('MP_Data')
