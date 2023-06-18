@@ -1,189 +1,51 @@
 import cv2
 import numpy as np
 import os
-from matplotlib import pyplot as plt
-import time
-import mediapipe as mp
+from sklearn.model_selection import train_test_split
+from mediapipe_utils import mediapipe_detection, draw_styled_landmarks
+from data_utils import extract_keypoints, create_data_directories, collect_frames_and_export_keypoints, load_data
+from model_utils import train_model, save_model, load_model, evaluate_model, calculate_accuracy, calculate_confusion_matrix
 
-mp_holistic = mp.solutions.holistic
-mp_drawing = mp.solutions.drawing_utils
-
-def mediapipe_detection(image, model):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # convert BGR -> RGB
-    image_copy = np.copy(image)  # create a copy of the image
-    image_copy.flags.writeable = False  # set the copy as non-writable
-    results = model.process(image_copy)
-    image_copy.flags.writeable = True  # set the copy as writable again
-    image_copy = cv2.cvtColor(image_copy, cv2.COLOR_RGB2BGR)  # convert RGB -> BGR
-    return image_copy, results
-
-#original, no format
-def draw_landmarks(image, results):
-    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION) # Draw face connections
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS) # Draw pose connections
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS) #Draw left hand connections
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS) # Draw right hand connections
-mp_holistic.POSE_CONNECTIONS
-
-def draw_styled_landmarks(image, results):
-    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION, # Draw face connections
-                              mp_drawing.DrawingSpec(color=(80,110, 10), thickness=1, circle_radius=1), # Color land mark, dot 
-                              mp_drawing.DrawingSpec(color=(80,256, 110), thickness=1, circle_radius=1)) # Color connections, line
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS, # Draw pose connections
-                              mp_drawing.DrawingSpec(color=(0,256,256), thickness=2, circle_radius=4), # Color land mark, dot 
-                              mp_drawing.DrawingSpec(color=(0,0,256), thickness=2, circle_radius=2)) # Color connections, line)
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, # Draw left hand connections
-                              mp_drawing.DrawingSpec(color=(256,0, 0), thickness=2, circle_radius=4), # Color land mark, dot 
-                              mp_drawing.DrawingSpec(color=(0,0, 256), thickness=2, circle_radius=2)) # Color connections, line)
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, # Draw right hand connections
-                              mp_drawing.DrawingSpec(color=(0,256, 0), thickness=2, circle_radius=4), # Color land mark, dot 
-                              mp_drawing.DrawingSpec(color=(0,0, 256), thickness=2, circle_radius=2)) # Color connections, line)
-
-
-cap = cv2.VideoCapture(0)
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
-    while cap.isOpened():
-
-        # Frame read, pretty fast
-        ret, frame = cap.read()
-
-        # make detections
-        image, results = mediapipe_detection(frame, holistic)
-        print(results)
-
-        # draw landmarks
-        draw_styled_landmarks(image,results)
-
-        # Output on screen
-        cv2.imshow('OpenCV Feed', image)
-
-        # break
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
-cap.release()
-cv2.destroyAllWindows()
-
-# extracting keypoint values from each part
-
-
-# pose = []
-# for res in results.pose_landmarks.landmark:
-#     test = np.array([res.x, res.y, res.z, res.visibility])
-#     pose.append(test)
-# the following funciton is what this does again ^
-
-def extract_keypoints(results):
-    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-    face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
-    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    return np.concatenate([pose, face, lh, rh])
-
-print(extract_keypoints(results)[:10])
-
-
-# Path for exported data, numpy arrays, where to store
+# Set up paths and parameters
 DATA_PATH = os.path.join('MP_Data')
+LOG_DIR = os.path.join('Logs')
+MODEL_FILE = 'action.h5'
 
-# Actions that we try to detect
-actions = np.array(['hello', 'thanks', 'iloveyou'])
-
-# 30 videos of data
-num_sequences = 30
-
-# 30 frames in the vid
+actions = np.array(['hello'])
+num_sequences = 50
 sequence_length = 30
 
-for action in actions:
-    for sequence in range(num_sequences):
-        try:
-            os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
-        except:
-            pass
+# Step 1: Create data directories
+create_data_directories(DATA_PATH, actions, num_sequences)
 
+# Step 2: Collect frames and export keypoints
 cap = cv2.VideoCapture(0)
-# Set mediapipe model 
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
-    
-    # NEW LOOP
-    # Loop through actions
-    for action in actions:
-        # Loop through sequences aka videos
-        for sequence in range(num_sequences):
-            # Loop through video length aka sequence length
-            for frame_num in range(sequence_length):
+collect_frames_and_export_keypoints(cap, DATA_PATH, actions, num_sequences, sequence_length)
 
-                # Read feed
-                ret, frame = cap.read()
+# # Step 3: Load data
+# X, y = load_data(DATA_PATH, actions, sequence_length)
 
-                # Make detections
-                image, results = mediapipe_detection(frame, holistic)
-#                 print(results)
+# # Step 4: Split data into training and test sets
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05)
 
-                # Draw landmarks
-                draw_styled_landmarks(image, results)
-                
-                # NEW Apply wait logic
-                if frame_num == 0: 
-                    cv2.putText(image, 'STARTING COLLECTION', (120,200), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0), 4, cv2.LINE_AA)
-                    cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(action, sequence), (15,12), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                    # Show to screen
-                    cv2.imshow('OpenCV Feed', image)
-                    cv2.waitKey(2000)
-                else: 
-                    cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(action, sequence), (15,12), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                    # Show to screen
-                    cv2.imshow('OpenCV Feed', image)
-                
-                # NEW Export keypoints
-                keypoints = extract_keypoints(results)
-                npy_path = os.path.join(DATA_PATH, action, str(sequence), str(frame_num))
-                np.save(npy_path, keypoints)
+# # Step 5: Train the model
+# model = train_model(X_train, y_train, LOG_DIR)
 
-                # Break gracefully
-                if cv2.waitKey(10) & 0xFF == ord('q'):
-                    break
-                    
-    cap.release()
-    cv2.destroyAllWindows()
+# # Step 6: Save the trained model
+# save_model(model, MODEL_FILE)
 
-from sklearn.model_selection import train_test_split
-from keras.utils import to_categorical
+# # Step 7: Load the trained model
+# loaded_model = load_model(MODEL_FILE)
 
-label_map = {label:num for num, label in enumerate(actions)}
+# # Step 8: Evaluate the model
+# yhat, ytrue = evaluate_model(loaded_model, X_test, y_test)
 
-sequences, labels = [], []
-for action in actions:
-    for sequence in np.array(os.listdir(os.path.join(DATA_PATH, action))).astype(int):
-        window = []
-        for frame_num in range(sequence_length):
-            res = np.load(os.path.join(DATA_PATH, action, str(sequence), "{}.npy".format(frame_num)))
-            window.append(res)
-        sequences.append(window)
-        labels.append(label_map[action])
+# # Step 9: Calculate accuracy
+# accuracy = calculate_accuracy(yhat, ytrue)
 
-y = to_categorical(labels).astype(int)
+# # Step 10: Calculate confusion matrix
+# confusion_matrix = calculate_confusion_matrix(yhat, ytrue)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05)
-
-from keras.models import Sequential
-from keras.layers import LSTM, Dense
-from keras.callbacks import TensorBoard
-
-
-# print(len(results.left_hand_landmarks.landmark))
-
-# draw_landmarks(frame, results)
-# plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-
-
-# Save the frame to a file
-# cv2.imwrite('output_image.jpg', frame)
-
-# Open the image using VS Code's image viewer
-# os.system('code output_image.jpg')
-
-# plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+# # Print the results
+# print(f"Accuracy: {accuracy}")
+# print(f"Confusion Matrix:\n{confusion_matrix}")
