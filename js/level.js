@@ -9,7 +9,7 @@ function displayText() {
 
   if (currentWordIndex === words.length - 1) {
     document.getElementById('changeButton').disabled = true;
-    document.getElementById('nextButton').classList.remove('hidden');
+    
   }
 
   currentWordIndex++;

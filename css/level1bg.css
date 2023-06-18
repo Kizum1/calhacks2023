@@ -11,14 +11,6 @@ body {
   animation:bg 5s linear infinite;
 }
 
-.dropping-texts {
-  display: inline-block;
-  white-space: nowrap;
-  width: fit-content;
-  text-align: left;
-  height: 400px;
-  
-}
 
 @keyframes bg {
   0% {background: #ff0075;}
@@ -34,9 +26,4 @@ body {
   100% {background: #F44336;}
 }
 
-.modelvideo {
-  position: absolute;
-  width: 60%;
-  height: 70%;
-  top: 35%;
-}
+.

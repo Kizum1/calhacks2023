@@ -16,13 +16,21 @@
     <h1 data-heading="title">Level 1: The Alphabet Area</h1>
     
     <div class="dropping-texts" id="dynamicText">Sign this:</div>
-   <div class="centerButton"> <img class="modelvideo" src="{{ url_for('video_feed') }}">
-    
-        <button id="changeButton" class="button-75" onclick="displayText()"><span class="text">Change Text</span></button>
+   <div class="centerButton"> 
+    <img id="video-stream" src="" width="400" height="300">
     </div>
-    <button id="nextButton" class="next-lvl" onclick="location.href='level2.html';">NEXT LEVEL</button>
+        <button  class="button-75" onclick="displayText()"><span class="text">Change Text</span></button>
+    
+    <button class="button-75" onclick="location.href='level2.html';">Next Level</button>
     
     <script src="js\level.js"></script>
+    <script>
+        $(document).ready(function () {
+            setInterval(function () {
+                $('#video-stream').attr('src', '/video_feed?' + new Date().getTime());
+            }, 1000);
+        });
+    </script>
 </body>
 
 </html>
