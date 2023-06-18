@@ -2,7 +2,7 @@
 body {
   margin:0px;
   text-align:center;
-  padding-top:15vh;
+  padding-top: 0.1vh;
   color:#fff;
   font-family:'Roboto';
   font-size:36px;
@@ -16,7 +16,7 @@ body {
   white-space: nowrap;
   width: fit-content;
   text-align: left;
-  height: 40px;
+  height: 400px;
   
 }
 
@@ -38,5 +38,5 @@ body {
   position: absolute;
   width: 60%;
   height: 70%;
-  top: 50%;
+  top: 35%;
 }

@@ -1,6 +1,6 @@
 // JavaScript code for level.js
 
-const words = ['Hello', 'World', 'OpenAI', 'GPT', 'Code'];
+const words = ['A', 'B', 'C', 'D', 'E'];
 let currentWordIndex = 0;
 
 function displayText() {
@@ -9,6 +9,7 @@ function displayText() {
 
   if (currentWordIndex === words.length - 1) {
     document.getElementById('changeButton').disabled = true;
+    document.getElementById('nextButton').classList.remove('hidden');
   }
 
   currentWordIndex++;
