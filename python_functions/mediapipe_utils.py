@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+
 import mediapipe as mp
 
 mp_holistic = mp.solutions.holistic
@@ -13,6 +14,13 @@ def mediapipe_detection(image, model):
     image_copy.flags.writeable = True  # set the copy as writable again
     image_copy = cv2.cvtColor(image_copy, cv2.COLOR_RGB2BGR)  # convert RGB -> BGR
     return image_copy, results
+
+def draw_landmarks(image, results):
+    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION) # Draw face connections
+    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS) # Draw pose connections
+    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS) #Draw left hand connections
+    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS) # Draw right hand connections
+mp_holistic.POSE_CONNECTIONS
 
 def draw_styled_landmarks(image, results):
     mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION, # Draw face connections

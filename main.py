@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from mediapipe_utils import mediapipe_detection, draw_styled_landmarks
 from data_utils import extract_keypoints, create_data_directories, collect_frames_and_export_keypoints, load_data
 from model_utils import train_model, save_model, load_model, evaluate_model, calculate_accuracy, calculate_confusion_matrix
+from camera import createModel
 
 # Set up paths and parameters
 DATA_PATH = os.path.join('MP_Data')
@@ -16,11 +17,14 @@ num_sequences = 50
 sequence_length = 30
 
 # Step 1: Create data directories
-create_data_directories(DATA_PATH, actions, num_sequences)
+# create_data_directories(DATA_PATH, actions, num_sequences)
 
 # Step 2: Collect frames and export keypoints
 cap = cv2.VideoCapture(0)
-collect_frames_and_export_keypoints(cap, DATA_PATH, actions, num_sequences, sequence_length)
+createModel(cap)
+
+
+#collect_frames_and_export_keypoints(cap, DATA_PATH, actions, num_sequences, sequence_length)
 
 # # Step 3: Load data
 # X, y = load_data(DATA_PATH, actions, sequence_length)

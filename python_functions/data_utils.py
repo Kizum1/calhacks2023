@@ -3,12 +3,17 @@ import numpy as np
 import cv2
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
+from mediapipe_utils import mediapipe_detection, draw_styled_landmarks
+import mediapipe as mp
 
 data_path = os.path.join('MP_Data')
 actions = np.array(['hello'])
 
 num_sequences = 50
 sequence_length = 30
+
+mp_holistic = mp.solutions.holistic
+mp_drawing = mp.solutions.drawing_utils
 
 def extract_keypoints(results):
     pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
