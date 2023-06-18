@@ -2,7 +2,7 @@
 body {
   margin:0px;
   text-align:center;
-  padding-top:20vh;
+  padding-top:15vh;
   color:#fff;
   font-family:'Roboto';
   font-size:36px;
@@ -32,4 +32,11 @@ body {
   80% {background: #F44336;}
   83% {background: #F44336;}
   100% {background: #F44336;}
+}
+
+.modelvideo {
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  top: 50%;
 }
