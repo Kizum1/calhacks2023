@@ -1,0 +1,14 @@
+
+  .Iam {
+    font: normal 40px/50px Montserrat, sans-serif;
+    color: #999;
+    justify-content: center;
+    align-items: center;
+  }
+ 
+  .Iam .innerIam {
+    display: inline-block;
+    color: #e74c3c;
+    position: relative;
+    white-space: nowrap;
+  }
