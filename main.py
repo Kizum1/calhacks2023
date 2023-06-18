@@ -40,7 +40,7 @@ def draw_styled_landmarks(image, results):
                               mp_drawing.DrawingSpec(color=(0,0, 256), thickness=2, circle_radius=2)) # Color connections, line)
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
 
@@ -62,6 +62,43 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             break
 cap.release()
 cv2.destroyAllWindows()
+
+# extracting keypoint values from each part
+
+
+# pose = []
+# for res in results.pose_landmarks.landmark:
+#     test = np.array([res.x, res.y, res.z, res.visibility])
+#     pose.append(test)
+# the following funciton is what this does again ^
+
+def extract_keypoints(results):
+    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
+    face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
+    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
+    return np.concatenate([pose, face, lh, rh])
+
+print(extract_keypoints(results)[:10])
+
+# Path for exported data, numpy arrays, where to store
+DATA_PATH = os.path.join('MP_Data')
+
+# Actions that we try to detect
+actions = np.array(['hello', 'thanks', 'iloveyou'])
+
+# 30 videos of data
+num_sequences = 30
+
+# 30 frames in the vid
+sequence_length = 30
+
+for action in actions:
+    for sequence in range(num_sequences):
+        try:
+            os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
+        except:
+            pass
 
 
 # print(len(results.left_hand_landmarks.landmark))
